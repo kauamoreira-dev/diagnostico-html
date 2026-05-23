@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico Estratégico de Conteúdo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white: #FFFFFF;
+    --yellow: #FFD300;
+    --yellow-dim: rgba(255,211,0,0.12);
+    --yellow-glow: rgba(255,211,0,0.25);
+    --gray: #757B81;
+    --graphite: #262B32;
+    --graphite-light: #2f3640;
+    --black: #090C11;
+    --black-mid: #0f1318;
+    --border: rgba(255,255,255,0.07);
+    --border-yellow: rgba(255,211,0,0.3);
+    --glass: rgba(38,43,50,0.6);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--black);
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,211,0,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,211,0,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -20%;
+    width: 60%;
+    height: 80%;
+    background: radial-gradient(ellipse, rgba(255,211,0,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page { position: relative; z-index: 1; }
+
+  /* ===== WELCOME PAGE ===== */
+  #page-welcome {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--yellow-dim);
+    border: 1px solid var(--border-yellow);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--yellow);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .badge-dot {
+    width: 6px; height: 6px;
+    background: var(--yellow);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  h1.hero {
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    max-width: 800px;
+    margin-bottom: 24px;
+  }
+
+  h1.hero span { color: var(--yellow); }
+
+  .hero-sub {
+    font-size: 18px;
+    color: var(--gray);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--yellow);
+    color: var(--black);
+    border: none;
+    padding: 16px 36px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Space Grotesk', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: -0.01em;
+  }
+
+  .btn-primary:hover {
+    background: #ffe033;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(255,211,0,0.3);
+  }
+
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: var(--gray);
+    border: 1px solid var(--border);
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: 'Space Grotesk', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-ghost:hover {
+    border-color: rgba(255,255,255,0.2);
+    color: var(--white);
+    background: rgba(255,255,255,0.04);
+  }
+
+  .welcome-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 64px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--yellow);
+    display: block;
+  }
+  .stat-label {
+    font-size: 13px;
+    color: var(--gray);
+    margin-top: 4px;
+  }
+
+  .divider {
+    width: 1px;
+    height: 40px;
+    background: var(--border);
+    align-self: center;
+  }
+
+  /* ===== FORM PAGES ===== */
+  #page-form {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+
+  .form-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(9,12,17,0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+  }
+
+  .form-header-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .form-logo {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--yellow);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  .progress-wrap {
+    flex: 1;
+    max-width: 400px;
+  }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .progress-label {
+    font-size: 12px;
+    color: var(--gray);
+    font-weight: 500;
+  }
+
+  .progress-count {
+    font-size: 12px;
+    color: var(--yellow);
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+  }
+
+  .progress-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--yellow);
+    border-radius: 100px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 12px rgba(255,211,0,0.5);
+  }
+
+  .form-body {
+    flex: 1;
+    padding: 40px 24px 80px;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .step { display: none; animation: fadeSlide 0.4s ease; }
+  .step.active { display: block; }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--yellow);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .step-title {
+    font-size: clamp(24px, 4vw, 36px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+    line-height: 1.1;
+  }
+
+  .step-desc {
+    font-size: 15px;
+    color: var(--gray);
+    margin-bottom: 36px;
+    line-height: 1.6;
+  }
+
+  .fields-grid {
+    display: grid;
+    gap: 20px;
+  }
+
+  .fields-grid.col2 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 600px) {
+    .fields-grid.col2 { grid-template-columns: 1fr; }
+  }
+
+  .field-group { display: flex; flex-direction: column; gap: 8px; }
+
+  label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray);
+    letter-spacing: 0.02em;
+  }
+
+  label .req { color: var(--yellow); margin-left: 2px; }
+
+  input[type="text"],
+  input[type="email"],
+  textarea,
+  select {
+    background: var(--graphite);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--white);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    padding: 14px 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    width: 100%;
+    resize: vertical;
+  }
+
+  input[type="text"]::placeholder,
+  textarea::placeholder {
+    color: rgba(117,123,129,0.5);
+  }
+
+  input[type="text"]:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--border-yellow);
+    box-shadow: 0 0 0 3px rgba(255,211,0,0.08);
+  }
+
+  textarea { min-height: 100px; }
+
+  select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23757B81' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+  }
+
+  select option { background: var(--graphite); }
+
+  .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--graphite);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray);
+    user-select: none;
+  }
+
+  .checkbox-item input { display: none; }
+
+  .checkbox-item.checked {
+    border-color: var(--border-yellow);
+    background: var(--yellow-dim);
+    color: var(--yellow);
+  }
+
+  .radio-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .radio-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--graphite);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray);
+    user-select: none;
+    flex: 1;
+    min-width: 100px;
+    justify-content: center;
+  }
+
+  .radio-item input { display: none; }
+
+  .radio-item.selected {
+    border-color: var(--border-yellow);
+    background: var(--yellow-dim);
+    color: var(--yellow);
+  }
+
+  /* ===== SUMMARY PAGE ===== */
+  .summary-grid {
+    display: grid;
+    gap: 16px;
+  }
+
+  .summary-card {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 24px;
+    backdrop-filter: blur(10px);
+  }
+
+  .summary-card-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--yellow);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .summary-card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .summary-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 8px 16px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    align-items: start;
+  }
+
+  .summary-row:last-child { border-bottom: none; }
+
+  .summary-key {
+    font-size: 12px;
+    color: var(--gray);
+    font-weight: 500;
+    padding-top: 1px;
+  }
+
+  .summary-val {
+    font-size: 14px;
+    color: var(--white);
+    line-height: 1.5;
+  }
+
+  .summary-val.empty { color: var(--gray); font-style: italic; font-size: 13px; }
+
+  /* ===== FORM FOOTER ===== */
+  .form-footer {
+    position: sticky;
+    bottom: 0;
+    background: rgba(9,12,17,0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    padding: 16px 24px;
+    z-index: 100;
+  }
+
+  .form-footer-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  /* ===== SUCCESS PAGE ===== */
+  #page-success {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .success-icon {
+    width: 72px; height: 72px;
+    background: var(--yellow-dim);
+    border: 2px solid var(--border-yellow);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 28px;
+  }
+
+  /* ===== ADMIN PAGE ===== */
+  #page-admin {
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .admin-header {
+    background: rgba(9,12,17,0.98);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .admin-logo {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--yellow);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .admin-logo span {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--gray);
+    background: var(--graphite);
+    padding: 3px 10px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+  }
+
+  .admin-body { padding: 32px; max-width: 1200px; margin: 0 auto; }
+
+  .admin-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .admin-stat {
+    background: var(--graphite);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .admin-stat-val {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--yellow);
+    font-family: 'DM Mono', monospace;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .admin-stat-label {
+    font-size: 13px;
+    color: var(--gray);
+    font-weight: 500;
+  }
+
+  .admin-table-wrap {
+    background: var(--graphite);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .admin-table-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .admin-table-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--white);
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left;
+    padding: 12px 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    background: rgba(9,12,17,0.5);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  tbody tr:hover { background: rgba(255,211,0,0.04); }
+  tbody tr:last-child { border-bottom: none; }
+
+  td {
+    padding: 14px 20px;
+    font-size: 14px;
+    color: var(--white);
+    vertical-align: middle;
+  }
+
+  td.muted { color: var(--gray); font-size: 13px; }
+
+  .tag {
+    display: inline-flex;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .tag-new {
+    background: rgba(255,211,0,0.15);
+    color: var(--yellow);
+    border: 1px solid rgba(255,211,0,0.3);
+  }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(9,12,17,0.9);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px;
+    overflow-y: auto;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--graphite);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 800px;
+    margin: auto;
+    overflow: hidden;
+    animation: modalIn 0.3s ease;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-title { font-size: 16px; font-weight: 600; }
+
+  .modal-close {
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    color: var(--gray);
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+
+  .modal-body { padding: 24px; max-height: 70vh; overflow-y: auto; }
+
+  .prompt-box {
+    background: var(--black);
+    border: 1px solid var(--border-yellow);
+    border-radius: 12px;
+    padding: 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.85);
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 16px;
+  }
+
+  .modal-actions {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* ===== UTILITY ===== */
+  .hidden { display: none !important; }
+
+  .copy-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--yellow);
+    color: var(--black);
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+
+  .copy-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .error-msg {
+    font-size: 12px;
+    color: #ff6b6b;
+    margin-top: 4px;
+    display: none;
+  }
+
+  .field-group.has-error input,
+  .field-group.has-error textarea,
+  .field-group.has-error select {
+    border-color: rgba(255,107,107,0.5);
+  }
+
+  .field-group.has-error .error-msg { display: block; }
+
+  .nav-link {
+    font-size: 14px;
+    color: var(--gray);
+    cursor: pointer;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    font-family: inherit;
+  }
+  .nav-link:hover { color: var(--yellow); }
+
+  @media (max-width: 480px) {
+    .summary-row { grid-template-columns: 1fr; }
+    .admin-body { padding: 16px; }
+    .admin-header { padding: 12px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COPY TOAST -->
+<div class="copy-toast" id="toast">✓ Copiado!</div>
+
+<!-- ===== PAGE: WELCOME ===== -->
+<div class="page" id="page-welcome">
+  <div>
+    <div class="badge">
+      <span class="badge-dot"></span>
+      Diagnóstico Estratégico
+    </div>
+    <h1 class="hero">
+      Conteúdo que<br><span>converte</span> começa<br>aqui.
+    </h1>
+    <p class="hero-sub">
+      Antes de criar qualquer conteúdo, precisamos entender seu negócio, seu cliente, seu posicionamento e seus objetivos. Responda com calma — quanto mais completas, mais precisa será a estratégia.
+    </p>
+    <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+      <button class="btn-primary" onclick="startForm()">
+        Começar diagnóstico
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <button class="btn-ghost" onclick="showAdmin()">
+        Painel Admin
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      </button>
+    </div>
+    <div class="welcome-stats">
+      <div class="stat-item">
+        <span class="stat-num">7</span>
+        <div class="stat-label">Etapas</div>
+      </div>
+      <div class="divider"></div>
+      <div class="stat-item">
+        <span class="stat-num">~10</span>
+        <div class="stat-label">Minutos</div>
+      </div>
+      <div class="divider"></div>
+      <div class="stat-item">
+        <span class="stat-num">100%</span>
+        <div class="stat-label">Estratégico</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: FORM ===== -->
+<div class="page hidden" id="page-form" style="display:none">
+  <header class="form-header">
+    <div class="form-header-inner">
+      <div class="form-logo">⬡ Diagnóstico</div>
+      <div class="progress-wrap">
+        <div class="progress-meta">
+          <span class="progress-label" id="step-label">Dados do negócio</span>
+          <span class="progress-count" id="step-count">1/6</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width:16.6%"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="form-body">
+
+    <!-- STEP 1: Dados do negócio -->
+    <div class="step active" id="step-1">
+      <div class="step-eyebrow">Etapa 01 / 06</div>
+      <h2 class="step-title">Dados do negócio</h2>
+      <p class="step-desc">Conte-nos sobre sua empresa. Essas informações são a base da estratégia.</p>
+      <div class="fields-grid col2">
+        <div class="field-group" id="fg-empresa">
+          <label>Nome da empresa <span class="req">*</span></label>
+          <input type="text" id="empresa" placeholder="Ex: Studio Digital XYZ">
+          <span class="error-msg">Campo obrigatório</span>
+        </div>
+        <div class="field-group" id="fg-responsavel">
+          <label>Nome do responsável <span class="req">*</span></label>
+          <input type="text" id="responsavel" placeholder="Seu nome completo">
+          <span class="error-msg">Campo obrigatório</span>
+        </div>
+        <div class="field-group" id="fg-segmento">
+          <label>Segmento / nicho <span class="req">*</span></label>
+          <input type="text" id="segmento" placeholder="Ex: Marketing digital, Saúde, Educação">
+          <span class="error-msg">Campo obrigatório</span>
+        </div>
+        <div class="field-group">
+          <label>Cidade / estado</label>
+          <input type="text" id="cidade" placeholder="Ex: São Paulo - SP">
+        </div>
+        <div class="field-group" style="grid-column:1/-1" id="fg-produto">
+          <label>Produto ou serviço principal <span class="req">*</span></label>
+          <input type="text" id="produto" placeholder="O que você vende de forma principal?">
+          <span class="error-msg">Campo obrigatório</span>
+        </div>
+        <div class="field-group">
+          <label>Ticket médio</label>
+          <input type="text" id="ticket" placeholder="Ex: R$ 1.500">
+        </div>
+        <div class="field-group" id="fg-como-ganha">
+          <label>Como a empresa ganha dinheiro hoje? <span class="req">*</span></label>
+          <input type="text" id="como-ganha" placeholder="Descreva brevemente o modelo de receita">
+          <span class="error-msg">Campo obrigatório</span>
+        </div>
+        <div class="field-group" style="grid-column:1/-1" id="fg-obj90">
+          <label>Principal objetivo nos próximos 90 dias <span class="req">*</span></label>
+          <textarea id="obj90" placeholder="O que você quer alcançar em 3 meses?"></textarea>
+          <span class="error-msg">Campo obrigatório</span>
+        </div>
+        <div class="field-group" style="grid-column:1/-1">
+          <label>Principal objetivo nos próximos 12 meses</label>
+          <textarea id="obj12" placeholder="Qual é a visão de longo prazo?"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Cliente ideal -->
+    <div class="step" id="step-2">
+      <div class="step-eyebrow">Etapa 02 / 06</div>
+      <h2 class="step-title">Cliente ideal</h2>
+      <p class="step-desc">Quem é a pessoa que você quer atrair e converter com conteúdo?</p>
+      <div class="fields-grid">
+        <div class="field-group" id="fg-cliente">
+          <label>Quem é o cliente ideal? <span class="req">*</span></label>
+          <textarea id="cliente" placeholder="Descreva: idade, perfil, cargo, situação de vida, hábitos..."></textarea>
+          <span class="error-msg">Campo obrigatório</span>
+        </div>
+        <div class="field-group" id="fg-problema">
+          <label>Qual problema ele quer resolver? <span class="req">*</span></label>
+          <textarea id="problema" placeholder="Qual dor ou desafio ele enfrenta que seu produto resolve?"></textarea>
+          <span class="error-msg">Campo obrigatório</span>
+        </div>
+        <div class="field-group">
+          <label>Qual desejo ele tem?</label>
+          <textarea id="desejo" placeholder="O que ele sonha em ter, ser ou alcançar?"></textarea>
+        </div>
+        <div class="field-group">
+          <label>Qual medo ele possui?</label>
+          <textarea id="medo" placeholder="O que ele teme perder ou errar?"></textarea>
+        </div>
+        <div class="field-group">
+          <label>O que impede ele de comprar?</label>
+          <textarea id="impede" placeholder="Barreiras, objeções, inseguranças..."></textarea>
+        </div>
+        <div class="field-group">
+          <label>O que ele já tentou antes?</label>
+          <textarea id="tentou" placeholder="Outras soluções que ele experimentou sem sucesso?"></textarea>
+        </div>
+        <div class="field-group">
+          <label>O que ele mais valoriza na hora de escolher uma empresa?</label>
+          <textarea id="valoriza" placeholder="Preço, reputação, velocidade, resultado, suporte..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Posicionamento -->
+    <div class="step" id="step-3">
+      <div class="step-eyebrow">Etapa 03 / 06</div>
+      <h2 class="step-title">Posicionamento</h2>
+      <p class="step-desc">Como sua marca se diferencia e como quer ser percebida no mercado?</p>
+      <div class="fields-grid">
+        <div class="field-group" id="fg-como-quer">
+          <label>Como a empresa quer ser vista? <span class="req">*</span></label>
+          <textarea id="como-quer" placeholder="Ex: autoridade, inovadora, acessível, premium..."></textarea>
+          <span class="error-msg">Campo obrigatório</span>
+        </div>
+        <div class="field-group">
+          <label>Quais são os principais diferenciais?</label>
+          <textarea id="diferenciais" placeholder="O que você faz de diferente ou melhor que os concorrentes?"></textarea>
+        </div>
+        <div class="field-group">
+          <label>O que os clientes mais elogiam?</label>
+          <textarea id="elogios" placeholder="Feedbacks positivos que você costuma receber?"></textarea>
+        </div>
+        <div class="field-group">
+          <label>O que os concorrentes fazem mal?</label>
+          <textarea id="concorrentes" placeholder="Pontos fracos do mercado que você poderia explorar?"></textarea>
+        </div>
+        <div class="field-group">
+          <label>Quais marcas ou perfis servem como referência?</label>
+          <textarea id="referencias" placeholder="Nomes, @perfis, marcas que admira ou quer se inspirar"></textarea>
+        </div>
+        <div class="field-group">
+          <label>Quais assuntos a marca deve evitar?</label>
+          <textarea id="evitar" placeholder="Temas polêmicos, concorrentes a não citar, assuntos sensíveis..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: Conteúdo atual -->
+    <div class="step" id="step-4">
+      <div class="step-eyebrow">Etapa 04 / 06</div>
+      <h2 class="step-title">Conteúdo atual</h2>
+      <p class="step-desc">O que já foi testado? O que funciona? O que não funciona?</p>
+      <div class="fields-grid">
+        <div class="field-group">
+          <label>Quais conteúdos já funcionaram?</label>
+          <textarea id="funcionou" placeholder="Formatos, temas, abordagens que geraram engajamento ou vendas"></textarea>
+        </div>
+        <div class="field-group">
+          <label>Quais conteúdos não funcionaram?</label>
+          <textarea id="nao-funcionou" placeholder="O que foi testado mas não trouxe resultado?"></textarea>
+        </div>
+        <div class="field-group">
+          <label>Quais formatos a empresa mais usa?</label>
+          <div class="checkbox-group" id="formatos-group">
+            <label class="checkbox-item" onclick="toggleCheck(this)">
+              <input type="checkbox" value="Reels"> Reels
+            </label>
+            <label class="checkbox-item" onclick="toggleCheck(this)">
+              <input type="checkbox" value="Carrossel"> Carrossel
+            </label>
+            <label class="checkbox-item" onclick="toggleCheck(this)">
+              <input type="checkbox" value="Stories"> Stories
+            </label>
+            <label class="checkbox-item" onclick="toggleCheck(this)">
+              <input type="checkbox" value="Post estático"> Post estático
+            </label>
+            <label class="checkbox-item" onclick="toggleCheck(this)">
+              <input type="checkbox" value="Lives"> Lives
+            </label>
+            <label class="checkbox-item" onclick="toggleCheck(this)">
+              <input type="checkbox" value="Anúncios"> Anúncios
+            </label>
+            <label class="checkbox-item" onclick="toggleCheck(this)">
+              <input type="checkbox" value="Outros"> Outros
+            </label>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>A empresa tem facilidade para gravar vídeos?</label>
+          <div class="radio-group" id="videos-group">
+            <label class="radio-item" onclick="selectRadio(this, 'videos-group')">
+              <input type="radio" name="videos" value="Sim"> Sim
+            </label>
+            <label class="radio-item" onclick="selectRadio(this, 'videos-group')">
+              <input type="radio" name="videos" value="Não"> Não
+            </label>
+            <label class="radio-item" onclick="selectRadio(this, 'videos-group')">
+              <input type="radio" name="videos" value="Depende"> Depende
+            </label>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Quanto tempo por semana consegue dedicar à produção de conteúdo?</label>
+          <input type="text" id="tempo-semana" placeholder="Ex: 2 horas, meio período, 1 dia...">
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5: Vendas -->
+    <div class="step" id="step-5">
+      <div class="step-eyebrow">Etapa 05 / 06</div>
+      <h2 class="step-title">Vendas</h2>
+      <p class="step-desc">Como funciona o processo comercial hoje?</p>
+      <div class="fields-grid">
+        <div class="field-group" id="fg-como-vende">
+          <label>Como a empresa vende hoje? <span class="req">*</span></label>
+          <textarea id="como-vende" placeholder="Ex: DM, WhatsApp, site, reunião consultiva, balcão..."></textarea>
+          <span class="error-msg">Campo obrigatório</span>
+        </div>
+        <div class="field-group">
+          <label>Onde chegam os leads?</label>
+          <textarea id="leads" placeholder="Instagram, indicação, Google, anúncios, eventos..."></textarea>
+        </div>
+        <div class="field-group">
+          <label>Qual principal objeção dos clientes?</label>
+          <textarea id="objecao" placeholder="O que eles falam antes de não comprar?"></textarea>
+        </div>
+        <div class="field-group">
+          <label>Existe uma oferta principal?</label>
+          <textarea id="oferta" placeholder="Descreva o produto/serviço âncora da empresa"></textarea>
+        </div>
+        <div class="field-group">
+          <label>Existe algum lançamento, campanha ou ação futura?</label>
+          <textarea id="lancamento" placeholder="Algo planejado que precisa ser aquecido com conteúdo?"></textarea>
+        </div>
+        <div class="field-group">
+          <label>Qual CTA costuma ser usado?</label>
+          <input type="text" id="cta" placeholder="Ex: 'Fale no WhatsApp', 'Clique no link', 'Chama no DM'">
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 6: Resumo -->
+    <div class="step" id="step-6">
+      <div class="step-eyebrow">Etapa 06 / 06</div>
+      <h2 class="step-title">Revisão do diagnóstico</h2>
+      <p class="step-desc">Confira todas as respostas antes de enviar. Você pode voltar e editar qualquer campo.</p>
+      <div class="summary-grid" id="summary-container"></div>
+    </div>
+
+  </div><!-- /form-body -->
+
+  <footer class="form-footer">
+    <div class="form-footer-inner">
+      <button class="btn-ghost" id="btn-back" onclick="prevStep()" style="display:none">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Voltar
+      </button>
+      <div style="flex:1"></div>
+      <button class="btn-primary" id="btn-next" onclick="nextStep()">
+        Próximo
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <button class="btn-primary hidden" id="btn-submit" onclick="submitForm()">
+        Enviar diagnóstico ✓
+      </button>
+    </div>
+  </footer>
+</div>
+
+<!-- ===== PAGE: SUCCESS ===== -->
+<div class="page hidden" id="page-success" style="display:none">
+  <div class="success-icon">✓</div>
+  <div class="badge" style="margin:0 auto 24px">
+    <span class="badge-dot"></span>
+    Diagnóstico recebido
+  </div>
+  <h2 style="font-size:clamp(28px,5vw,48px); font-weight:700; letter-spacing:-0.03em; margin-bottom:16px;">
+    Diagnóstico enviado<br>com <span style="color:var(--yellow)">sucesso!</span>
+  </h2>
+  <p style="color:var(--gray); font-size:16px; max-width:480px; line-height:1.7; margin-bottom:40px;">
+    Suas respostas foram salvas. O prompt estratégico foi gerado automaticamente e está disponível no painel administrativo.
+  </p>
+  <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+    <button class="btn-primary" onclick="showAdmin()">
+      Ver painel admin
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+    <button class="btn-ghost" onclick="showWelcome()">
+      Novo diagnóstico
+    </button>
+  </div>
+</div>
+
+<!-- ===== PAGE: ADMIN ===== -->
+<div class="page hidden" id="page-admin" style="display:none">
+  <div class="admin-header">
+    <div class="admin-logo">
+      ⬡ Diagnóstico
+      <span>Painel Admin</span>
+    </div>
+    <button class="btn-ghost" onclick="showWelcome()" style="font-size:13px; padding:10px 18px;">
+      ← Voltar ao site
+    </button>
+  </div>
+  <div class="admin-body">
+    <div class="admin-stats">
+      <div class="admin-stat">
+        <span class="admin-stat-val" id="total-count">0</span>
+        <div class="admin-stat-label">Diagnósticos recebidos</div>
+      </div>
+      <div class="admin-stat">
+        <span class="admin-stat-val" id="today-count">0</span>
+        <div class="admin-stat-label">Hoje</div>
+      </div>
+      <div class="admin-stat">
+        <span class="admin-stat-val" id="week-count">0</span>
+        <div class="admin-stat-label">Últimos 7 dias</div>
+      </div>
+    </div>
+
+    <div class="admin-table-wrap">
+      <div class="admin-table-header">
+        <div class="admin-table-title">Diagnósticos</div>
+        <button class="btn-ghost" onclick="exportAll()" style="font-size:12px; padding:8px 16px;">
+          Exportar todos (TXT)
+        </button>
+      </div>
+      <div id="admin-table-body">
+        <div style="padding:48px; text-align:center; color:var(--gray);">
+          <div style="font-size:40px; margin-bottom:12px; opacity:0.3">📋</div>
+          <div style="font-size:15px;">Nenhum diagnóstico ainda.</div>
+          <div style="font-size:13px; margin-top:6px; opacity:0.7">Os diagnósticos aparecerão aqui após o envio.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: DETAIL ===== -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Diagnóstico</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="copyPrompt()" style="font-size:14px; padding:12px 24px;">
+        📋 Copiar prompt estratégico
+      </button>
+      <button class="btn-ghost" onclick="exportTxt()" style="font-size:14px; padding:12px 24px;">
+        ↓ Exportar TXT
+      </button>
+      <button class="btn-ghost" onclick="closeModal()" style="margin-left:auto; font-size:14px; padding:12px 24px;">
+        Fechar
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== STATE =====
+let currentStep = 1;
+const totalSteps = 6;
+let currentModalData = null;
+
+// ===== STORAGE (localStorage as DB) =====
+function saveRecord(data) {
+  const records = getRecords();
+  data.id = Date.now().toString();
+  data.date = new Date().toISOString();
+  records.unshift(data);
+  localStorage.setItem('diagnosticos', JSON.stringify(records));
+  return data;
+}
+
+function getRecords() {
+  try { return JSON.parse(localStorage.getItem('diagnosticos') || '[]'); } catch { return []; }
+}
+
+// ===== NAVIGATION =====
+function showPage(id) {
+  ['page-welcome','page-form','page-success','page-admin'].forEach(p => {
+    const el = document.getElementById(p);
+    el.style.display = 'none';
+    el.classList.add('hidden');
+  });
+  const show = document.getElementById(id);
+  show.style.display = 'flex';
+  show.classList.remove('hidden');
+  if (id !== 'page-form') window.scrollTo(0,0);
+}
+
+function showWelcome() { showPage('page-welcome'); }
+
+function startForm() {
+  currentStep = 1;
+  showPage('page-form');
+  updateStep();
+  window.scrollTo(0,0);
+}
+
+function showAdmin() {
+  showPage('page-admin');
+  renderAdmin();
+}
+
+// ===== FORM STEPS =====
+const stepLabels = ['Dados do negócio','Cliente ideal','Posicionamento','Conteúdo atual','Vendas','Revisão'];
+
+function updateStep() {
+  // Show/hide steps
+  for (let i = 1; i <= totalSteps; i++) {
+    const el = document.getElementById('step-' + i);
+    if (el) { el.classList.remove('active'); el.style.display = 'none'; }
+  }
+  const cur = document.getElementById('step-' + currentStep);
+  if (cur) { cur.classList.add('active'); cur.style.display = 'block'; }
+
+  // Progress
+  const pct = (currentStep / totalSteps) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('step-label').textContent = stepLabels[currentStep-1];
+  document.getElementById('step-count').textContent = currentStep + '/' + totalSteps;
+
+  // Buttons
+  document.getElementById('btn-back').style.display = currentStep > 1 ? '' : 'none';
+  const btnNext = document.getElementById('btn-next');
+  const btnSubmit = document.getElementById('btn-submit');
+  if (currentStep === totalSteps) {
+    btnNext.classList.add('hidden');
+    btnSubmit.classList.remove('hidden');
+    buildSummary();
+  } else {
+    btnNext.classList.remove('hidden');
+    btnSubmit.classList.add('hidden');
+  }
+  window.scrollTo(0,0);
+}
+
+function nextStep() {
+  if (!validateStep(currentStep)) return;
+  if (currentStep < totalSteps) { currentStep++; updateStep(); }
+}
+
+function prevStep() {
+  if (currentStep > 1) { currentStep--; updateStep(); }
+}
+
+// ===== VALIDATION =====
+const stepRequired = {
+  1: ['empresa','responsavel','segmento','produto','como-ganha','obj90'],
+  2: ['cliente','problema'],
+  3: ['como-quer'],
+  5: ['como-vende']
+};
+
+function validateStep(step) {
+  const reqs = stepRequired[step] || [];
+  let ok = true;
+  reqs.forEach(id => {
+    const el = document.getElementById(id);
+    const fg = document.getElementById('fg-' + id);
+    if (el && fg && !el.value.trim()) {
+      fg.classList.add('has-error');
+      ok = false;
+    } else if (fg) {
+      fg.classList.remove('has-error');
+    }
+  });
+  if (!ok) {
+    const firstError = document.querySelector('.has-error input, .has-error textarea');
+    if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  return ok;
+}
+
+// ===== CHECKBOX / RADIO =====
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  const inp = el.querySelector('input');
+  inp.checked = !inp.checked;
+}
+
+function selectRadio(el, groupId) {
+  document.querySelectorAll('#' + groupId + ' .radio-item').forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+  el.querySelector('input').checked = true;
+}
+
+// ===== COLLECT DATA =====
+function getFormats() {
+  const checked = [];
+  document.querySelectorAll('#formatos-group .checkbox-item.checked input').forEach(i => checked.push(i.value));
+  return checked.join(', ') || '—';
+}
+
+function getVideo() {
+  const sel = document.querySelector('#videos-group .radio-item.selected input');
+  return sel ? sel.value : '—';
+}
+
+function val(id) { const el = document.getElementById(id); return el ? (el.value.trim() || '—') : '—'; }
+
+function collectData() {
+  return {
+    // Dados
+    empresa: val('empresa'),
+    responsavel: val('responsavel'),
+    segmento: val('segmento'),
+    cidade: val('cidade'),
+    produto: val('produto'),
+    ticket: val('ticket'),
+    comoGanha: val('como-ganha'),
+    obj90: val('obj90'),
+    obj12: val('obj12'),
+    // Cliente
+    cliente: val('cliente'),
+    problema: val('problema'),
+    desejo: val('desejo'),
+    medo: val('medo'),
+    impede: val('impede'),
+    tentou: val('tentou'),
+    valoriza: val('valoriza'),
+    // Posicionamento
+    comoQuer: val('como-quer'),
+    diferenciais: val('diferenciais'),
+    elogios: val('elogios'),
+    concorrentes: val('concorrentes'),
+    referencias: val('referencias'),
+    evitar: val('evitar'),
+    // Conteúdo
+    funcionou: val('funcionou'),
+    naoFuncionou: val('nao-funcionou'),
+    formatos: getFormats(),
+    video: getVideo(),
+    tempoSemana: val('tempo-semana'),
+    // Vendas
+    comoVende: val('como-vende'),
+    leads: val('leads'),
+    objecao: val('objecao'),
+    oferta: val('oferta'),
+    lancamento: val('lancamento'),
+    cta: val('cta'),
+  };
+}
+
+// ===== SUMMARY =====
+const summaryConfig = [
+  { title: 'Dados do negócio', fields: [
+    ['Empresa', 'empresa'], ['Responsável', 'responsavel'], ['Segmento', 'segmento'],
+    ['Cidade', 'cidade'], ['Produto principal', 'produto'], ['Ticket médio', 'ticket'],
+    ['Como ganha dinheiro', 'comoGanha'], ['Objetivo 90 dias', 'obj90'], ['Objetivo 12 meses', 'obj12']
+  ]},
+  { title: 'Cliente ideal', fields: [
+    ['Cliente ideal', 'cliente'], ['Problema a resolver', 'problema'], ['Desejo', 'desejo'],
+    ['Medo', 'medo'], ['O que impede compra', 'impede'], ['Já tentou', 'tentou'], ['O que valoriza', 'valoriza']
+  ]},
+  { title: 'Posicionamento', fields: [
+    ['Como quer ser vista', 'comoQuer'], ['Diferenciais', 'diferenciais'], ['Elogios recebidos', 'elogios'],
+    ['Concorrentes falham em', 'concorrentes'], ['Referências', 'referencias'], ['Assuntos a evitar', 'evitar']
+  ]},
+  { title: 'Conteúdo atual', fields: [
+    ['O que funcionou', 'funcionou'], ['O que não funcionou', 'naoFuncionou'],
+    ['Formatos usados', 'formatos'], ['Facilidade com vídeos', 'video'], ['Tempo por semana', 'tempoSemana']
+  ]},
+  { title: 'Vendas', fields: [
+    ['Como vende', 'comoVende'], ['Onde chegam leads', 'leads'], ['Principal objeção', 'objecao'],
+    ['Oferta principal', 'oferta'], ['Lançamento / campanha', 'lancamento'], ['CTA usado', 'cta']
+  ]}
+];
+
+function buildSummary() {
+  const data = collectData();
+  const container = document.getElementById('summary-container');
+  container.innerHTML = summaryConfig.map(section => `
+    <div class="summary-card">
+      <div class="summary-card-title">${section.title}</div>
+      ${section.fields.map(([label, key]) => `
+        <div class="summary-row">
+          <div class="summary-key">${label}</div>
+          <div class="summary-val ${data[key] === '—' ? 'empty' : ''}">${data[key]}</div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+// ===== PROMPT GENERATOR =====
+function generatePrompt(data) {
+  return `Você é um estrategista de conteúdo sênior. Com base nas informações abaixo, crie uma estratégia completa de conteúdo para este cliente.
+
+Entregue:
+1. Resumo executivo do negócio
+2. Diagnóstico de posicionamento
+3. ICP/persona principal
+4. Dores, desejos, medos e objeções
+5. Linha editorial
+6. Pilares de conteúdo
+7. Funil de conteúdo: Atrair, Qualificar e Converter
+8. Distribuição percentual dos conteúdos
+9. 30 ideias de conteúdo
+10. Ganchos para Reels
+11. CTAs recomendados
+12. Banco inicial de criativos
+13. Recomendações estratégicas para os próximos 90 dias
+
+═══════════════════════════════════════════════
+DADOS DO CLIENTE
+═══════════════════════════════════════════════
+
+▌ DADOS DO NEGÓCIO
+Empresa: ${data.empresa}
+Responsável: ${data.responsavel}
+Segmento: ${data.segmento}
+Cidade: ${data.cidade}
+Produto/serviço principal: ${data.produto}
+Ticket médio: ${data.ticket}
+Como ganha dinheiro: ${data.comoGanha}
+Objetivo 90 dias: ${data.obj90}
+Objetivo 12 meses: ${data.obj12}
+
+▌ CLIENTE IDEAL
+Quem é: ${data.cliente}
+Problema a resolver: ${data.problema}
+Desejo: ${data.desejo}
+Medo: ${data.medo}
+O que impede de comprar: ${data.impede}
+O que já tentou: ${data.tentou}
+O que mais valoriza: ${data.valoriza}
+
+▌ POSICIONAMENTO
+Como quer ser vista: ${data.comoQuer}
+Diferenciais: ${data.diferenciais}
+Elogios recebidos: ${data.elogios}
+Concorrentes fazem mal: ${data.concorrentes}
+Referências de marca: ${data.referencias}
+Assuntos a evitar: ${data.evitar}
+
+▌ CONTEÚDO ATUAL
+O que funcionou: ${data.funcionou}
+O que não funcionou: ${data.naoFuncionou}
+Formatos usados: ${data.formatos}
+Facilidade com vídeos: ${data.video}
+Tempo por semana: ${data.tempoSemana}
+
+▌ VENDAS
+Como vende hoje: ${data.comoVende}
+Onde chegam leads: ${data.leads}
+Principal objeção: ${data.objecao}
+Oferta principal: ${data.oferta}
+Lançamentos/campanhas futuras: ${data.lancamento}
+CTA usado: ${data.cta}
+
+═══════════════════════════════════════════════
+Com base nesses dados, crie a estratégia completa e detalhada conforme os 13 itens solicitados.
+═══════════════════════════════════════════════`;
+}
+
+// ===== SUBMIT =====
+function submitForm() {
+  const data = collectData();
+  data.prompt = generatePrompt(data);
+  saveRecord(data);
+  showPage('page-success');
+}
+
+// ===== ADMIN =====
+function renderAdmin() {
+  const records = getRecords();
+  document.getElementById('total-count').textContent = records.length;
+
+  const now = new Date();
+  const todayStr = now.toDateString();
+  const weekAgo = new Date(now - 7 * 86400000);
+
+  document.getElementById('today-count').textContent = records.filter(r => new Date(r.date).toDateString() === todayStr).length;
+  document.getElementById('week-count').textContent = records.filter(r => new Date(r.date) >= weekAgo).length;
+
+  const tbody = document.getElementById('admin-table-body');
+  if (!records.length) {
+    tbody.innerHTML = `<div style="padding:48px; text-align:center; color:var(--gray);">
+      <div style="font-size:40px; margin-bottom:12px; opacity:0.3">📋</div>
+      <div style="font-size:15px;">Nenhum diagnóstico ainda.</div>
+    </div>`;
+    return;
+  }
+
+  tbody.innerHTML = `<table>
+    <thead>
+      <tr>
+        <th>Empresa</th>
+        <th>Responsável</th>
+        <th>Segmento</th>
+        <th>Data</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${records.map((r,i) => `
+        <tr onclick="openModal(${i})">
+          <td><strong>${r.empresa}</strong></td>
+          <td class="muted">${r.responsavel}</td>
+          <td class="muted">${r.segmento}</td>
+          <td class="muted">${formatDate(r.date)}</td>
+          <td><span class="tag tag-new">Novo</span></td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>`;
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+// ===== MODAL =====
+function openModal(index) {
+  const records = getRecords();
+  const data = records[index];
+  currentModalData = data;
+
+  document.getElementById('modal-title').textContent = data.empresa + ' — ' + formatDate(data.date);
+
+  const sections = [
+    { title: 'Dados do negócio', rows: [
+      ['Empresa', data.empresa], ['Responsável', data.responsavel], ['Segmento', data.segmento],
+      ['Cidade', data.cidade], ['Produto', data.produto], ['Ticket', data.ticket],
+      ['Como ganha', data.comoGanha], ['Obj. 90 dias', data.obj90], ['Obj. 12 meses', data.obj12]
+    ]},
+    { title: 'Cliente ideal', rows: [
+      ['Cliente ideal', data.cliente], ['Problema', data.problema], ['Desejo', data.desejo],
+      ['Medo', data.medo], ['O que impede', data.impede], ['Já tentou', data.tentou], ['Valoriza', data.valoriza]
+    ]},
+    { title: 'Posicionamento', rows: [
+      ['Como quer ser vista', data.comoQuer], ['Diferenciais', data.diferenciais],
+      ['Elogios', data.elogios], ['Concorrentes', data.concorrentes],
+      ['Referências', data.referencias], ['Evitar', data.evitar]
+    ]},
+    { title: 'Conteúdo atual', rows: [
+      ['Funcionou', data.funcionou], ['Não funcionou', data.naoFuncionou],
+      ['Formatos', data.formatos], ['Vídeos', data.video], ['Tempo/semana', data.tempoSemana]
+    ]},
+    { title: 'Vendas', rows: [
+      ['Como vende', data.comoVende], ['Leads', data.leads], ['Objeção', data.objecao],
+      ['Oferta', data.oferta], ['Lançamento', data.lancamento], ['CTA', data.cta]
+    ]}
+  ];
+
+  document.getElementById('modal-body').innerHTML = `
+    ${sections.map(s => `
+      <div class="summary-card" style="margin-bottom:16px;">
+        <div class="summary-card-title">${s.title}</div>
+        ${s.rows.map(([k,v]) => `
+          <div class="summary-row">
+            <div class="summary-key">${k}</div>
+            <div class="summary-val">${v || '—'}</div>
+          </div>
+        `).join('')}
+      </div>
+    `).join('')}
+    <div style="margin-top:24px;">
+      <div class="summary-card-title" style="font-size:11px; font-weight:600; color:var(--yellow); letter-spacing:.1em; text-transform:uppercase; margin-bottom:12px;">Prompt estratégico gerado</div>
+      <div class="prompt-box">${escHtml(data.prompt || '')}</div>
+    </div>
+  `;
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function escHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  currentModalData = null;
+}
+
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+
+// ===== COPY PROMPT =====
+function copyPrompt() {
+  if (!currentModalData) return;
+  navigator.clipboard.writeText(currentModalData.prompt).then(() => showToast('✓ Prompt copiado!'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== EXPORT TXT =====
+function exportTxt() {
+  if (!currentModalData) return;
+  const d = currentModalData;
+  const content = d.prompt + '\n\n--- Diagnóstico exportado em ' + formatDate(d.date) + ' ---';
+  download(d.empresa.replace(/\s+/g,'-') + '_diagnostico.txt', content);
+}
+
+function exportAll() {
+  const records = getRecords();
+  if (!records.length) { showToast('Nenhum registro'); return; }
+  const content = records.map(d => d.prompt + '\n\n--- ' + d.empresa + ' — ' + formatDate(d.date) + ' ---\n\n').join('\n═══════════════════════════════════════════════\n\n');
+  download('diagnosticos_todos.txt', content);
+}
+
+function download(filename, text) {
+  const a = document.createElement('a');
+  a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
+  a.download = filename;
+  a.click();
+}
+
+// ===== INIT =====
+document.querySelectorAll('input[type="text"], textarea, select').forEach(el => {
+  el.addEventListener('input', () => {
+    const fg = el.closest('.field-group');
+    if (fg) fg.classList.remove('has-error');
+  });
+});
+
+showPage('page-welcome');
+</script>
+</body>
+</html>
